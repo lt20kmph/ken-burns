@@ -1,0 +1,14 @@
+static/tmp/
+config/client_session_key.aes
+config/test-settings.yml
+config/keter.yml
+uploads/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+.stack-work/
+yesod-devel/
+ken-burns.cabal
+.dir-locals.el
+keys.json
+stack.yaml.lock

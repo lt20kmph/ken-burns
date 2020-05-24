@@ -1,0 +1,118 @@
+<div #upload-head .masthead>
+    <div .container>
+        <div .row>
+            <h1 .header>
+                Ken-Burns slide show
+            <h4>
+                Create a slide show from your pictures using machine learning
+                and the Ken-Burns effect 
+    ^{navbar}
+    <div #form>
+<div #upload-container .container>
+  <div .container.centered-container.upload-form.content-bubble>
+    <div>
+      <h3 .centered-text.kill-top-margin>
+        Upload your pictures to get started
+      <form method=post action=@{UploadFileR}#form enctype=#{enctype}>
+        ^{formWidget_}
+        <button .my-btn.btn-primary.full-width type="submit">
+          Upload file 
+      <button .my-btn.btn-primary.full-width.kill-bottom-margin onclick="window.location.href='@{LoadingR}';">
+        Generate slideshow! 
+  <div .container.content-bubble>
+    <div .row.centered-container.wrap>
+      $with ls <- fileList
+          $if Import.null ls
+              <div .centered-container>
+                <h4>Nothing uploaded yet!
+          $else
+            $forall file <- ls 
+              <img src="files/#{fileDir}/#{file}">
+
+<div #info .masthead>
+  <h1 .header>
+    Info
+  ^{navbar}
+
+<div .container.med-big-width>
+  <h2>
+    What is the Ken-Burns effect?
+  <p>
+    It is an effect used to animate still images using a combination of
+    zooming and panning. It was used extensively by American film maker Ken
+    Burns and hence the name. For more information see
+    <a href="https://en.wikipedia.org/wiki/Ken_Burns_effect"> 
+      wikipedia
+    .
+  <h2>
+    How does machine learning come into it?
+  <p>
+    One problem with trying to automatically create a slide show from some
+    pictures is that the Ken-Burns effect works best when there is some
+    interesting detail in the photo which can be focused on. 
+    If one just chooses a spot in the photo to zoom and pan on into at
+    random then usually it turns out you miss the interesting part of the
+    photo. 
+    This is where machine learning comes in.
+    Modern day algorithms based on neural networks and machine learning
+    can identify objects in pictures and hence the location of these objects
+    can be used as input to a script which automatically generates a 
+    Ken-Burns slide show.
+  <h2>
+    So how does it work?
+  <p>
+    You upload your pictures using the form up there and then they are
+    sent to Googles Cloud Vision API which sends back information about the
+    pictures.
+    More information about Cloud Vision 
+    <a href="https://cloud.google.com/vision/">
+      here 
+    .
+    Then a (Haskell) script on my server processes this information 
+    and generates a CSS
+    file containing details about how to animate the images. 
+    A little bit Javascript is used to avoid having to load all the 
+    pictures simultaneously and potentially causing your browser to
+    malfunction.
+  <h2>
+    Tips to get the best results
+  <p>
+    I have found it works best with clear images of things or nice landscape
+    pictures. 
+    If there are things in the photo but they are not that clearly
+    defined or quite small the Cloud Vision algorithm may fail to find them
+    and my script will fall back on another method to decide where the
+    interesting part of the picture is. 
+    Also a small amount of randomness is injected into the process, so once
+    you have your results you can refresh the page and you will get slightly
+    different results.
+    This happens almost instantly since the slow part is sending the images
+    to Googles API and this only needs to happen once.
+  <h2>
+    Todo
+  <p>
+    I will add some settings:
+    <ul>
+      <li>
+        Speed control
+      <li>
+        Amount of randomness
+      <li>
+        Allow user to change order of the slides
+
+    I plan on producing a command line version of this website so that 
+    anyone who
+    wants can experiment at their own leisure. 
+    I could also train my own object detection algorithm so I don't need to
+    rely on Googles API.
+    The problem with this is that my current hardware is not up to the job so
+    I would need to out source it to some cloud computing API anyway and
+    probably also upgrade my server.
+
+<div #examples .masthead>
+  <h1 .header>
+    Gallery
+  ^{navbar}
+
+<div .container>
+  ^{slideshow}

@@ -1,0 +1,6 @@
+history.replaceState(null, null,"@{UploadFileR}".replace('http','https'));
+
+$(document).ready(function() {
+ // executes when HTML-Document is loaded and DOM is ready
+ window.location.href="@{ResultR}".replace('http','https');
+});

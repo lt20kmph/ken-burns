@@ -1,0 +1,59 @@
+var slider = document.getElementById("durationSlider");
+slider.onmouseup = function () {
+    var duration = slider.value/12+4;
+    changeSpeed(duration);
+    window.delay = duration * 500 - 8 * 20;
+}
+
+function changeSpeed(duration){
+    var theRules = new Array();
+    if (document.styleSheets[2].cssRules) {
+        theRules = document.styleSheets[2].cssRules;
+    } 
+    else if (document.styleSheets[2].rules) {
+        theRules = document.styleSheets[2].rules;
+    }
+    for (n in theRules)
+    {
+        if (theRules[n].selectorText == ".all-pics")   {
+            theRules[n].style.animationDuration=duration+'s';
+        }
+    }
+}
+
+function displayLinkDiv() {
+  document.getElementById("linkdisplay").style.display="block";
+}
+
+function copyStringToClipboard (str) {
+   // Create new element
+   var el = document.createElement('textarea');
+   // Set value (string to be copied)
+   el.value = str;
+   // Set non-editable to avoid focus and move outside of view
+   el.setAttribute('readonly', '');
+   el.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(el);
+   // Select text inside element
+   el.select();
+   // Copy text to clipboard
+   document.execCommand('copy');
+   // Remove temporary element
+   document.body.removeChild(el);
+}
+
+function copyToClipBoard() {
+  var link = document.getElementById("sharing-link").value; 
+  console.log(link);
+  copyStringToClipboard(link);
+  document.getElementById("linkdisplay").style.display="none";
+}
+
+$(document).mouseup(function(e){
+    var container = $("#linkdisplay");
+
+    // If the target of the click isn't the container
+    if(!container.is(e.target) && container.has(e.target).length === 0){
+        container.hide();
+    }
+});

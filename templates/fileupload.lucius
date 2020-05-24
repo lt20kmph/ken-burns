@@ -1,0 +1,12 @@
+li {
+    line-height: 2em;
+    font-size: 16px
+}
+
+.content-bubble img {
+  height: #{show $ th}px;
+}
+
+#upload-container {
+    min-height: 100vh;
+}

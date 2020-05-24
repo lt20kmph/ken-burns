@@ -1,0 +1,5 @@
+ImageData
+    sessionID Text
+    imgID Text
+    index Int
+    deriving Show Typeable

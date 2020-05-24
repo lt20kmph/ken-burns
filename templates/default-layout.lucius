@@ -1,0 +1,254 @@
+:root {
+  --color-0:#090f0f;
+  --color-1:#1b263b;
+  --color-2:#415A77;
+  --color-3:#778DA9;
+  --color-4:#E0E1DD;
+}
+
+body {
+  background-color: var(--color-4);
+  height: 100%;
+}
+
+html {
+  height: 100%;
+  position: relative;
+}
+
+.footer-pos {
+  min-height:91%;
+}
+
+.my-footer {
+  position:absolute;
+  height: min(8%,20px);
+  bottom: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.masthead {
+    background-color: var(--color-0);
+}
+
+.masthead {
+    margin-top: -51px;
+    color: var(--color-4);
+    text-align: center;
+    /* min-height: 250px; */
+    margin-bottom: 20px;
+}
+
+.masthead .header {
+    max-width: 710px;
+    margin: 0 auto;
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+}
+
+.masthead h1.header {
+    margin-top: 1em;
+    margin-bottom: 0em;
+    font-size: 5em;
+    line-height: 1.2em;
+    font-weight: normal;
+ }
+
+@media only screen and (max-width: 520px) {
+
+   .masthead h1.header {
+      font-size: 3em; 
+   }
+   .masthead {
+      margin-top:-30px;
+   }
+}
+
+.centered-container {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.med-big-width {
+  width: clamp(400px,60vw,680px);
+}
+
+.med-width {
+  width: clamp(400px,40vw,680px);
+}
+
+.centered-text {
+  text-align:center;
+}
+
+.justied-text {
+  text-align:justify;
+}
+
+.my-btn {
+  font-weight: 500;
+  font-size: 1.3em;
+  color: var(--color-3);
+  background-color: var(--color-0);
+  border: 2px solid var(--color-2);
+  margin-bottom:4px;
+}
+
+.btn:hover {
+  color: var(--color-0);
+  background-color: var(--color-3);
+}
+
+.content-bubble {
+  padding: 20px 20px;
+  border: 2px solid var(--color-2);
+  background-color: var(--color-0);
+  color: var(--color-4);
+  border-radius: 13px;
+  width: 80vw;
+}
+
+.kill-top-margin {
+  margin-top:0px;
+}
+
+.kill-bottom-margin {
+  margin-bottom:0px;
+}
+
+hr {
+  border-top: 2px solid var(--color-0);
+  margin-bottom: 5px;
+}
+
+.text-blue {
+  color: var(--color-1);
+}
+
+.content-bubble img {
+  min-width: 25vw;
+  padding: 5px;
+}
+
+.upload-form {
+  margin-bottom: 20px;
+  /* height: 150px; */
+}
+
+.wrap {
+  flex-wrap:wrap;
+}
+
+#message {
+    margin-bottom: 40px;
+    position: fixed;
+    background-color: var(--color-1);
+    border: 2px solid var(--color-2);
+    top: 45%;
+    color: var(--color-3);
+    width: 18%;
+    left: 41%;
+}
+
+.nav-btn {
+  display: inline-block;
+  font-weight: 500;
+  font-size: 1.4em;
+  color: var(--color-3);
+  background-color: var(--color-0);
+  border: 0px solid var(--color-2);
+  padding: 3px;
+  margin: 0px;
+  min-width: 45px;
+}
+
+.nav-btn:hover {
+  color: var(--color-0);
+  background-color: var(--color-3);
+}
+
+.nav-container {
+  /* justify-content: right; */
+  height:38px;
+  display: flex;
+  border-top: 2px solid var(--color-2);
+}
+
+.my-tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.my-tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: var(--color-1);
+  color: var(--color-4);
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  top: 120%;
+  left: 70%;
+  font-size: 0.7em;
+  margin-left: -60%;
+  box-shadow: 0 8px 16px 0 var(--color-0);
+}
+
+.hugeText {
+  font-size: 15em;
+}
+
+.my-tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 10%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent var(--color-1) transparent;
+}
+
+.my-tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+#linkdisplay {
+  display:none;
+  position: fixed;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  width: min(480px,98vw);
+  font-size: 1.1em;
+}
+
+.code {
+  font-family: Consolas,"courier-new";
+  background-color:var(--color-3);
+  color:var(--color-4);
+  padding:2px;
+  /* width: 95%; */
+}
+
+.btn-link {
+  background-color:var(--color-4);
+  border-radius: 0 3px 3px 0;
+  color:var(--color-1);
+}
+
+.set-bg {
+  background-color:var(--color-4);
+}

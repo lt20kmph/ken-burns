@@ -1,0 +1,19 @@
+<div .container.med-width>
+  <div .centered-container.centered-text>
+    ^{header}
+  <div .centered-container>
+    <p .justied-text>Depending on how many pictures you uploaded, this can #
+      take a few moments.
+      Please do not close this tab, when your slideshow is ready you
+      will be automatically redirected.
+<div .centered-container>
+  <div .lds-grid>
+    <div>
+    <div>
+    <div>
+    <div>
+    <div>
+    <div>
+    <div>
+    <div>
+    <div>

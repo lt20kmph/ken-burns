@@ -1,0 +1,9 @@
+<div .masthead>
+  <div .container>
+    <div .row>
+      <h1 .header>
+        Your slide show
+      <h4>
+        Adjust the speed/download a copy or share it with a link
+  ^{navbar}
+^{slideshow}
