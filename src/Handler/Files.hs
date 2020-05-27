@@ -24,7 +24,7 @@ import           System.Random
 import           Test.RandomStrings
 import           GetJson
 import           System.FilePath (takeBaseName)
-import           Prelude (read)
+-- import           Prelude (read)
 import           Data.List (nub)
 import           Text.Blaze.Html.Renderer.Text
 import qualified Data.Text.Lazy as L
@@ -48,6 +48,38 @@ thumbHeight = 168
 
 getLoadingR :: Handler Html
 getLoadingR = do
+  sid <- lookupSession "sessionID"
+  case sid of
+    Just x  -> do
+      fl <- getFileList x
+      g fl (unpack x)
+        where g fl u 
+                  | (length fl) > 1 = getLoadingSuccess
+                  | otherwise       = getLoadingFail u
+
+getLoadingFail :: String -> Handler Html
+getLoadingFail sid = do
+  (formWidget_, enctype) <- generateFormPost buildForm
+  setMessage "Please upload 2 or more pictures!"
+  uf <- uploadFolder
+  fl <- getFileList exampleSid
+  let thumbsDir = uf </> (unpack sid) </> "thumbs"
+  let navbar = uploadNav
+  let slideshow = getResultById exampleSid fl uf 50
+  let upldhead = uploadHeader 0 
+  defaultLayout $ do
+    let _fileList True dir = listDirectory dir  
+        _fileList False _ = return [] :: IO [FilePath]
+    b <- liftIO $ doesDirectoryExist thumbsDir
+    fileList <- liftIO $ _fileList b thumbsDir
+    let fileDir = (unpack sid) </> "thumbs"
+    let th = thumbHeight :: Int
+    setTitle "Ken-Burns slideshow"
+    $(widgetFile "fileupload")
+
+
+getLoadingSuccess :: Handler Html
+getLoadingSuccess = do
   defaultLayout $ do
     setTitle "loading.. "
     let header = [hamlet|
@@ -117,12 +149,13 @@ getUploadFileR = do
   iD <- liftIO $ mkSessId
   setSession "sessionID" (pack iD)
   uf <- uploadFolder
-  -- fp <- liftIO $ listDirectory $ uf </> "00000000" </> "imgs"
+  -- fp <- liftIO $ listDirectory $ uf </> "20058826" </> "imgs"
   -- addTesting2DB fp
   fl <- getFileList exampleSid
   -- sfl <- liftIO $ sampleRandomFiles 6 fl
   let slideshow = getResultById exampleSid fl uf 50
   let navbar = uploadNav
+  let upldhead = uploadHeader 0 
   defaultLayout $ do
       let fileList = [] :: [FilePath]
           fileDir = "" :: FilePath
@@ -155,6 +188,25 @@ uploadNav = [hamlet|
           Gallery
   |]
 
+uploadHeader :: Int -> HtmlUrl (Route App)
+uploadHeader n 
+  | n == 0    = [hamlet|Upload your pictures to get started|]
+  | otherwise = [hamlet|Upload more pictures|]
+
+--   (formWidget_, enctype) <- generateFormPost buildForm
+--   fl <- getFileList exampleSid
+--   uf <- uploadFolder
+--   let uplpwidget = $(widgetFile "uploadprogress")
+--   let slideshow = getResultById exampleSid fl uf 50
+--   let navbar = uploadNav
+--   defaultLayout $ do
+--       let fileList = [] :: [FilePath]
+--           fileDir = "" :: FilePath
+--       let th = thumbHeight :: Int
+--       setTitle "Ken-Burns slideshow"
+--       $(widgetFile "fileupload")
+
+
 postUploadFileR :: Handler Html
 postUploadFileR = do
   ((result, formWidget_), enctype) <- runFormPost buildForm
@@ -170,6 +222,7 @@ postUploadFileR = do
       let imgsDir = uf </> (unpack x) </> "imgs"
       let thumbsDir = uf </> (unpack x) </> "thumbs"
       liftIO $ createDirectoryIfMissing True imgsDir 
+      liftIO $ createDirectoryIfMissing True thumbsDir 
       case result of
 
         FormSuccess formData -> do
@@ -182,13 +235,17 @@ postUploadFileR = do
                                thumbHeight 
           addimage2DB x (pack iiD) 
 
-        _ -> do
-          setMessage "Sorry, something bad happened, please try again."
+        FormFailure _ -> do
+          setMessage "Please select a file!" 
+
+        FormMissing ->
+          setMessage "Please select a file!!!"
 
       defaultLayout $ do
         fileList <- liftIO $ listDirectory thumbsDir 
         let fileDir = (unpack x) </> "thumbs"
         let th = thumbHeight :: Int
+        let upldhead = uploadHeader $ length fileList 
         setTitle "Ken-Burns slideshow"
         $(widgetFile "fileupload")
 
@@ -197,22 +254,24 @@ postUploadFileR = do
         let fileList = [] :: [FilePath] 
             fileDir = "" :: FilePath
         let th = thumbHeight :: Int
+        let upldhead = uploadHeader 0 
         setTitle "Ken-Burns slideshow"
         $(widgetFile "fileupload")
 
 addimage2DB :: Text -> Text -> HandlerFor App () 
 addimage2DB sessId imgId = runDB $ do
- sessImgs <- selectList 
-               [ ImageDataSessionID ==. sessId ]
-               []
- let i = length (sessImgs) + 1
- _ <- insert $ ImageData sessId imgId i
- return ()
+  sessImgs <- selectList 
+                [ ImageDataSessionID ==. sessId ]
+                []
+  let i = length (sessImgs) + 1
+  _ <- insert $ ImageData sessId imgId i
+  return ()
 
 addTesting2DB :: [FilePath] -> HandlerFor App ()
 addTesting2DB fp = runDB $ do 
   let bases = map takeBaseName fp 
-      inputs = map (\x -> ImageData "00000000" (pack x) (read x)) bases
+      indexedBase = zip bases ([1..6] :: [Int])
+      inputs = map (\(x,y) -> ImageData "20058826" (pack x) y) indexedBase
   _ <- insertMany inputs 
   return ()
 

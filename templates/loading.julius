@@ -1,6 +1,19 @@
-history.replaceState(null, null,"@{UploadFileR}".replace('http','https'));
-
+//if (window.location.protocol === 'http:') {
+//  history.replaceState(null, null,"@{UploadFileR}".replace('http','https'));
+//}
+//else if (window.location.protocol == 'https:') {
+//  history.replaceState(null,null,"@{UploadFileR}");
+//}
+//
+//$(document).ready(function() {
+// if (window.location.protocol === 'http:') {
+//   window.location.href="@{ResultR}".replace('http','https');
+// }
+// else if (window.location.protocol === 'https:') {
+//    window.location.href="@{ResultR}";
+// }
+//});
+history.replaceState(null, null,"@{UploadFileR}");
 $(document).ready(function() {
- // executes when HTML-Document is loaded and DOM is ready
- window.location.href="@{ResultR}".replace('http','https');
+   window.location.href="@{ResultR}";
 });

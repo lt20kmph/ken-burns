@@ -4,6 +4,11 @@ slider.onmouseup = function () {
     changeSpeed(duration);
     window.delay = duration * 500 - 8 * 20;
 }
+slider.ontouchend = function () {
+    var duration = slider.value/12+4;
+    changeSpeed(duration);
+    window.delay = duration * 500 - 8 * 20;
+}
 
 function changeSpeed(duration){
     var theRules = new Array();

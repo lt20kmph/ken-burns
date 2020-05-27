@@ -1,7 +1,8 @@
 <!-- Static navbar -->
 <!-- Page Contents -->
 $maybe msg <- mmsg
-  <div .alert.alert-info #message>#{msg}
+  <div .alert.alert-info #message>
+    <i .fa.fa-warning> #{msg}
 <div .footer-pos>
   ^{widget}
 <!-- Footer -->

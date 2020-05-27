@@ -21,7 +21,8 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 import Database.Persist.Sqlite (ConnectionPool, runSqlPool)
-import Model
+import Network.Wai (requestHeaderHost)
+-- import Model
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -72,10 +73,16 @@ instance Yesod App where
     -- Controls the base of generated URLs. For more information on modifying,
     -- see: https://github.com/yesodweb/yesod/wiki/Overriding-approot
     approot :: Approot App
-    approot = ApprootRequest $ \app req ->
-        case appRoot $ appSettings app of
-            Nothing -> getApprootText guessApproot app req
-            Just root -> root
+    approot = ApprootRequest $ \_ r -> maybe ""
+      -- (mappend (if isSecure r then "https://" else "http://") . decodeUtf8)
+      (mappend "https://" . decodeUtf8)
+      (requestHeaderHost r)
+    -- approot = ApprootRelative
+    -- approot = ApprootStatic "http://localhost"
+    -- approot = ApprootRequest $ \app req ->
+    --     case appRoot $ appSettings app of
+    --         Nothing -> getApprootText guessApproot app req
+    --         Just root -> root
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
@@ -99,7 +106,7 @@ instance Yesod App where
 
     maximumContentLength :: App -> Maybe (Route App) -> Maybe Word64
     maximumContentLength _ (Just _) = Just 6291456 
-    maximumContentLength _ Nothing = Just 0 
+    maximumContentLength _ Nothing = Just 1024 
     -- Yesod Middleware allows you to run code before and after each handler function.
     -- The defaultYesodMiddleware adds the response header "Vary: Accept, Accept-Language" and performs authorization checks.
     -- Some users may also want to add the defaultCsrfMiddleware, which:
@@ -115,10 +122,10 @@ instance Yesod App where
         master <- getYesod
         mmsg <- getMessage
 
-        mcurrentRoute <- getCurrentRoute
+        -- mcurrentRoute <- getCurrentRoute
 
         -- Get the breadcrumbs, as defined in the YesodBreadcrumbs instance.
-        (title, parents) <- breadcrumbs
+        -- (title, parents) <- breadcrumbs
 
         -- Define the menu items of the header.
         -- let menuItems =

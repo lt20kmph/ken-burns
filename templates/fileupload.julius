@@ -11,10 +11,47 @@ $('#fileupload').bind('change', function() {
 });
 
 $(document).ready(function () {
-    $('#message').fadeOut(5000);
+    $('#message').delay(2000).fadeOut(500);
+    $('#ulform').trigger("reset");
     var h = document.getElementById("upload-head");
     var height = h.offsetHeight + "px";
     var c = document.getElementById("upload-container")
     c.style.minHeight = "calc(102vh - " + height + ")";
-    console.log(height);
+    //console.log(height);
+    //$('#ulform').ajaxForm(function() { 
+    //    alert("Thank you for your comment!"); 
+    //}); 
+    var bar = $('.my-bar');
+    var form = $('#form-container');
+    var progress = $('.my-progress');
+    var msg = $('#ulformheader');
+    progress.hide();
+
+    $('#ulform').ajaxForm({
+        beforeSend: function() {
+            if ($('#fileupload').val() != "") {
+              form.hide();
+              progress.show();
+              bar.width('0%');
+              msg.html("Upload in progress...");
+            }
+            else {
+              return false;
+            };
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+            var percentVal = percentComplete + '%';
+            bar.width(percentVal);
+        },
+        complete: function() {
+            form.show();
+            progress.hide();
+            msg.html("Upload another picture");
+        },
+        target: $('body')
+    });
 });
+
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}

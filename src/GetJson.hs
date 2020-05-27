@@ -15,44 +15,42 @@ module GetJson
 import Text.Hamlet
 import Text.Julius
 import Text.Lucius
-import Data.Typeable
+-- import Data.Typeable
 import           Data.Aeson
 import qualified Data.ByteString.Char8      as S8
-import qualified Data.Yaml                  as Yaml
+-- import qualified Data.Yaml                  as Yaml
 import           GHC.Generics
 import           Network.HTTP.Simple
 import           Control.Monad
-import           Data.Aeson                 (encode, object, (.:?), (.=))
+-- import           Data.Aeson                 (encode, object, (.:?), (.=))
 import           Data.Aeson.Text            (encodeToLazyText)
 import           Data.ByteString.Base64     as B64
 import qualified Data.ByteString.Lazy       as B
-import qualified Data.ByteString.Lazy.Char8 as L8
-import           Data.Text.Lazy             (Text)
+-- import qualified Data.ByteString.Lazy.Char8 as L8
+-- import           Data.Text.Lazy             (Text)
 import           Data.Text.Lazy.IO          as I
 import           Network.HTTP.Client        as HC
-import           Network.HTTP.Client.TLS
-import           Network.HTTP.Types.Status  (statusCode)
-import           System.Directory           (getDirectoryContents
-                                            ,doesFileExist   
+-- import           Network.HTTP.Client.TLS
+-- import           Network.HTTP.Types.Status  (statusCode)
+import           System.Directory           (
+                                            doesFileExist   
                                             ,createDirectoryIfMissing
-                                            ,listDirectory)
-import           System.FilePath            (takeExtension 
-                                            ,splitExtension
-                                            ,takeBaseName
-                                            ,replaceExtension
+                                            )
+import           System.FilePath            (
+                                            takeBaseName
                                             ,(</>)
-                                            ,takeFileName)
+                                            )
 import           System.IO                  as S
 import           System.Process
 import Data.Maybe
-import Text.Printf
+-- import Text.Printf
 import           System.Random
 import Data.Sort
 import Foundation
-import Data.Foldable
+-- import Data.Foldable
 import           Graphics.GD
-import Data.Functor.Adjunction (zipR)
-import Data.Functor
+-- import Data.Functor.Adjunction (zipR)
+-- import Data.Functor
 
 ratio :: Float
 ratio = 0.5
@@ -61,7 +59,7 @@ scalefactor :: Float
 scalefactor = 0.5
 
 rawImgWidth :: FilePath -> Int
-rawImgWidth fp = 1500
+rawImgWidth _ = 1500
 
 rawImgHeight :: FilePath -> IO Int
 rawImgHeight fp = do
@@ -465,12 +463,18 @@ _mkjs delay files indices = [julius|
 var files = #{rawJS $ show files};
 var indices = #{rawJS $ show indices};
 var numfiles = files.length;
-window.evens = 2;
 window.odds = 1;
 window.delay = #{rawJS delay};
+
+if (numfiles == 2) {
+  $(".pic0").css("animation-iteration-count","infinite");
+};
+
+window.evens = 2%numfiles;
+
 $('body').on("animationstart","#fst", function(){
-  console.log(window.odds);
-  console.log(indices[window.odds]);
+  //console.log(window.odds);
+  //console.log(indices[window.odds]);
   window.setTimeout(function(){
       $("#snd").replaceWith(
         '<img id="snd" class="all-pics pic'.concat(
@@ -486,8 +490,8 @@ $('body').on("animationstart","#fst", function(){
   );
 });
 $('body').on("animationstart","#snd", function(){
-  console.log(window.evens);
-  console.log(indices[window.evens]);
+  //console.log(window.evens);
+  //console.log(indices[window.evens]);
   window.setTimeout(function(){
       $("#fst").replaceWith(
         '<img id="fst" class="all-pics pic'.concat(

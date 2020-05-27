@@ -4,6 +4,7 @@
   --color-2:#415A77;
   --color-3:#778DA9;
   --color-4:#E0E1DD;
+  --color-red:#E34234;
 }
 
 body {
@@ -62,6 +63,17 @@ html {
    .masthead {
       margin-top:-30px;
    }
+   .content-bubble h3 {
+      font-size: 1.4em;
+   }
+}
+
+.maxwidth {
+  max-width: 78vw;
+}
+
+.fcol {
+  flex-direction:column;
 }
 
 .centered-container {
@@ -75,11 +87,11 @@ html {
 }
 
 .med-big-width {
-  width: clamp(400px,60vw,680px);
+  width: clamp(300px,60vw,680px);
 }
 
 .med-width {
-  width: clamp(400px,40vw,680px);
+  width: clamp(300px,40vw,680px);
 }
 
 .centered-text {
@@ -147,12 +159,17 @@ hr {
 #message {
     margin-bottom: 40px;
     position: fixed;
-    background-color: var(--color-1);
-    border: 2px solid var(--color-2);
-    top: 45%;
-    color: var(--color-3);
-    width: 18%;
-    left: 41%;
+    background-color: var(--color-4);
+    border: 2px solid var(--color-red);
+    top: 50%;
+    color: var(--color-0);
+    width: min(380px,95vw);
+    left: 50%;
+    font-size: 1.4em;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
 }
 
 .nav-btn {
@@ -251,4 +268,18 @@ hr {
 
 .set-bg {
   background-color:var(--color-4);
+}
+
+.my-progress {
+  height: 26px;
+  width: 100%;
+  background-color: var(--color-1); 
+  border: 1 solid var(--color-0);
+  border-radius: 3px;
+}
+
+.my-bar {
+  height: 26px; 
+  width: 0%;
+  background-color: var(--color-4);
 }

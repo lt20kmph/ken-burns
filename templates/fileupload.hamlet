@@ -10,24 +10,38 @@
     <div #form>
 <div #upload-container .container>
   <div .container.centered-container.upload-form.content-bubble>
-    <div>
-      <h3 .centered-text.kill-top-margin>
-        Upload your pictures to get started
-      <form method=post action=@{UploadFileR}#form enctype=#{enctype}>
-        ^{formWidget_}
-        <button .my-btn.btn-primary.full-width type="submit">
-          Upload file 
-      <button .my-btn.btn-primary.full-width.kill-bottom-margin onclick="window.location.href='@{LoadingR}';">
-        Generate slideshow! 
-  <div .container.content-bubble>
-    <div .row.centered-container.wrap>
-      $with ls <- fileList
-          $if Import.null ls
-              <div .centered-container>
-                <h4>Nothing uploaded yet!
-          $else
-            $forall file <- ls 
-              <img src="files/#{fileDir}/#{file}">
+    <div .centered-container.fcol>
+      <h3 #ulformheader .centered-text.kill-top-margin.maxwidth>
+        $with n <- length fileList
+            $if n == 0 
+                Upload some files to get started
+            $elseif n == 1 
+                Upload at least one more file 
+            $else
+                Keep uploading or generate your show 
+
+      <div #form-container>
+        <form #ulform .maxwidth method=post action=@{UploadFileR} enctype=#{enctype}>
+          ^{formWidget_}
+          <button .my-btn.btn-primary.full-width type="submit">
+            Upload file 
+        $with n <- length fileList
+          $if n > 1
+            <button .my-btn.btn-primary.full-width.kill-bottom-margin.maxwidth onclick="window.location.href='@{LoadingR}';">
+              Generate slideshow! 
+      <div .my-progress>
+        <div .my-bar>
+
+  <div id="status"></div>
+    <div #t1 .container.content-bubble>
+      <div #t2 .row.centered-container.wrap>
+        $with ls <- fileList
+            $if Import.null ls
+                <div .centered-container>
+                  <h4>Nothing uploaded yet!
+            $else
+              $forall file <- ls 
+                <img src="files/#{fileDir}/#{file}">
 
 <div #info .masthead>
   <h1 .header>
@@ -91,14 +105,16 @@
   <h2>
     Todo
   <p>
-    I will add some settings:
     <ul>
       <li>
-        Speed control
+        <strike> Speed control</strike> 
+        <i .fa.fa-check>
       <li>
-        Amount of randomness
+        Allow user to play with the amount of randomness
       <li>
         Allow user to change order of the slides
+      <li>
+        Stream line uploading process
 
     I plan on producing a command line version of this website so that 
     anyone who
