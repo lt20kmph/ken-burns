@@ -40,8 +40,9 @@
                 <div .centered-container>
                   <h4>Nothing uploaded yet!
             $else
-              $forall file <- ls 
-                <img src="files/#{fileDir}/#{file}">
+              <div .thumbnail-container.centered-container.wrap>
+                $forall file <- ls 
+                  <img src="files/#{fileDir}/#{file}">
 
 <div #info .masthead>
   <h1 .header>

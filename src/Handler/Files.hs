@@ -1,5 +1,6 @@
 {-# LANGUAGE BlockArguments        #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveGeneric        #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TemplateHaskell       #-}
@@ -19,13 +20,15 @@ import           Yesod.Form.Bootstrap3  (BootstrapFormLayout (..)
                                         )
 import           Data.Time.Clock
 import           Data.Time.Clock.POSIX
+-- import Data.Map  (Map)
+import qualified Data.Map as Map
 import           Graphics.GD
 import           System.Random
 import           Test.RandomStrings
 import           GetJson
+import           Text.Read (read)
 import           System.FilePath (takeBaseName)
--- import           Prelude (read)
-import           Data.List (nub)
+import           Data.List (nub,(!!))
 import           Text.Blaze.Html.Renderer.Text
 import qualified Data.Text.Lazy as L
 import qualified Data.ByteString.Lazy as B
@@ -39,6 +42,8 @@ data FileForm = FileForm
     { fileInfo        :: FileInfo
     , fileDescription :: Text
     }
+
+type QueryString = String
 
 width :: Int
 width = 1500
@@ -65,8 +70,9 @@ getLoadingFail sid = do
   fl <- getFileList exampleSid
   let thumbsDir = uf </> (unpack sid) </> "thumbs"
   let navbar = uploadNav
-  let slideshow = getResultById exampleSid fl uf 50
-  let upldhead = uploadHeader 0 
+  settings <- mkSettingsDefault uf (unpack exampleSid) fl
+  let slideshow = getResultById settings
+  -- let upldhead = uploadHeader 0 
   defaultLayout $ do
     let _fileList True dir = listDirectory dir  
         _fileList False _ = return [] :: IO [FilePath]
@@ -90,6 +96,7 @@ getLoadingSuccess = do
 getResultR :: Handler Html
 getResultR = do
   sid <- lookupSession "sessionID"
+  let _sid = fromMaybe (pack "ERROR") sid
   case sid of
     Just x  -> do
       let navbar = resultsNav x 50 
@@ -98,7 +105,9 @@ getResultR = do
       liftIO $ mainJSON uf (unpack x) fl
       -- page <- liftIO $ mkPageResult uf (unpack x) fl 50 
       -- let slideshow = pageHtml page 
-      let slideshow = getResultById x fl uf 50
+      settings <- mkSettingsDefault uf (unpack x) fl
+      let query = buildQuery settings 
+      let slideshow = getResultById settings 
       defaultLayout $ do
         setTitle "Ken-Burns slideshow"
         -- fold (map toWidget $ pageCss page) 
@@ -110,13 +119,18 @@ getResultR = do
         Unfortunatly something seems to have gone wrong
         |]
       let navbar = resultsNav "NA" 50
+      settings <- mkSettingsDefault "NA" "NA" []
+      let query = buildQuery settings 
       defaultLayout $ do
         setTitle "Oops!"
         $(widgetFile "results")
 
-getResultById :: Text -> [(String,Int)] -> FilePath -> Int -> Widget 
-getResultById sid xs fp dur = do
-  page <- liftIO $ mkPageResult fp (unpack sid) xs dur 
+postResultR :: Handler Html
+postResultR = getResultR 
+
+getResultById :: SettingsData -> Widget 
+getResultById settings = do
+  page <- liftIO $ mkPageResult settings 
   toWidget $ pageHtml page 
   fold (map toWidget $ pageCss page) 
   toWidgetBody $ pageJs page
@@ -126,10 +140,38 @@ getResultByIdR sid = do
   setSession "sessionID" sid 
   fl <- getFileList sid
   uf <- uploadFolder
+  settings <- mkSettingsDefault uf (unpack sid) fl
   defaultLayout $ do
     setTitle "Ken-Burns slideshow"
     let navbar = resultsNav sid 50 
-    let slideshow = getResultById sid fl uf 50
+    let slideshow = getResultById settings 
+    let _sid = sid
+    let query = buildQuery settings
+    $(widgetFile "results")
+
+postResultByIdR :: Text -> Handler Html
+postResultByIdR sid = do
+  setSession "sessionID" sid 
+  fl        <- getFileList sid
+  -- zooms     <- mapM (g "Zooms") fl
+  -- objects   <- mapM (g "Object") fl
+  -- let f (x,y) o z = (x, ImageSettings y o z 50)
+  uf <- uploadFolder
+  settings <- mkSettings uf 
+                            (unpack sid)
+                            fl 
+                            50
+                            (Just (lookupPostParam . (++ "Object")))
+                            (Just (lookupPostParam . (++ "maxZoom")))
+                            (Just (lookupPostParam . (++ "minZoom")))
+                            (Just (lookupPostParam . (++ "Random")))
+                            Nothing
+  defaultLayout $ do
+    setTitle "Ken-Burns slideshow"
+    let navbar = resultsNav sid 50 
+    let slideshow = getResultById settings
+    let _sid = sid
+    let query = buildQuery settings
     $(widgetFile "results")
 
 getFileList :: Text -> Handler [(String,Int)]
@@ -142,6 +184,7 @@ getFileList sessId = runDB $ do
 
 exampleSid :: Text
 exampleSid = "20058826"
+-- exampleSid = "00000000"
 
 getUploadFileR :: Handler Html
 getUploadFileR = do
@@ -152,10 +195,11 @@ getUploadFileR = do
   -- fp <- liftIO $ listDirectory $ uf </> "20058826" </> "imgs"
   -- addTesting2DB fp
   fl <- getFileList exampleSid
-  -- sfl <- liftIO $ sampleRandomFiles 6 fl
-  let slideshow = getResultById exampleSid fl uf 50
+  -- sfl <- liftIO $ sampleRandomFiles 20 fl
+  settings <- mkSettingsDefault uf (unpack exampleSid) fl
+  let slideshow = getResultById settings
   let navbar = uploadNav
-  let upldhead = uploadHeader 0 
+  -- let upldhead = uploadHeader 0 
   defaultLayout $ do
       let fileList = [] :: [FilePath]
           fileDir = "" :: FilePath
@@ -214,7 +258,8 @@ postUploadFileR = do
   fl <- getFileList exampleSid
   uf <- uploadFolder
   -- sfl <- liftIO $ sampleRandomFiles 12 fl
-  let slideshow = getResultById exampleSid fl uf 50
+  settings <- mkSettingsDefault uf (unpack exampleSid) fl
+  let slideshow = getResultById settings
   let navbar = uploadNav
   case sid of
 
@@ -245,7 +290,7 @@ postUploadFileR = do
         fileList <- liftIO $ listDirectory thumbsDir 
         let fileDir = (unpack x) </> "thumbs"
         let th = thumbHeight :: Int
-        let upldhead = uploadHeader $ length fileList 
+        -- let upldhead = uploadHeader $ length fileList 
         setTitle "Ken-Burns slideshow"
         $(widgetFile "fileupload")
 
@@ -254,7 +299,7 @@ postUploadFileR = do
         let fileList = [] :: [FilePath] 
             fileDir = "" :: FilePath
         let th = thumbHeight :: Int
-        let upldhead = uploadHeader 0 
+        -- let upldhead = uploadHeader 0 
         setTitle "Ken-Burns slideshow"
         $(widgetFile "fileupload")
 
@@ -299,7 +344,6 @@ buildForm =  renderBootstrap3 BootstrapInlineForm $ UploadForm
           , fsName = Nothing
           , fsAttrs = []
           }
-
 
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
@@ -379,27 +423,29 @@ getDownloadR = do
     Just x  -> do
       fl <- getFileList x 
       uf <- uploadFolder
-      page <- liftIO $ mkPageDl uf (unpack x) fl 50 
+      -- page <- liftIO $ mkPageDl uf (unpack x) fl 50 
+      settings <- mkSettingsDefault uf (unpack x) fl   
+      page <- liftIO $ mkPageDl settings 
       let html = fmap renderHtml $ withUrlRenderer $ pageHtml page
           css = map (renderCssUrl undefined) $ pageCss page
           js = renderJavascriptUrl undefined $ pageJs page
       _html <- fmap (fromString . L.unpack) html
       let _css = fromString $ fold $ map L.unpack css 
-      let _js = fromString $ L.unpack js 
+          _js = fromString $ L.unpack js 
       time <- liftIO $ round `fmap` getPOSIXTime
 
       let imgName p = "imgs" </> p ++ ".JPG" 
-      let imgLoc p = uf </> (unpack x) </> (imgName p) 
-      let g x = (imgName x,B.readFile (imgLoc x))
-      let f (n,b) = fmap (toEntry n time) b
+          imgLoc p = uf </> (unpack x) </> (imgName p) 
+          g y = (imgName y,B.readFile (imgLoc y))
+          f (n,b) = fmap (toEntry n time) b
 
       pics <- liftIO $ sequence $ map (f . g . fst) fl
 
       let hE = toEntry "slideshow.html" time _html
-      let cE = toEntry "slideshow.css" time _css
-      let jE = toEntry "slideshow.js" time _js
-      let entries = [hE,cE,jE] ++ pics
-      let zipfile = fromArchive $ addEntriesToArchive entries emptyArchive
+          cE = toEntry "slideshow.css" time _css
+          jE = toEntry "slideshow.js" time _js
+          entries = [hE,cE,jE] ++ pics
+          zipfile = fromArchive $ addEntriesToArchive entries emptyArchive
       addHeader "Content-Disposition" $ concat
             [ "attachment; filename=\"", "slideshow.zip", "\""]
       sendResponse ( fromString "application/zip" :: ByteString, toContent zipfile)
@@ -412,7 +458,8 @@ data Duration = Duration { duration :: Int }
 
 
 resultsNav :: Text -> Int -> HtmlUrl (Route App) 
-resultsNav sid d = [hamlet|
+resultsNav sid d = do
+  [hamlet|
   <div #afterpost .nav-container>
     <button .nav-btn.my-tooltip 
       onclick="window.location.href='@{UploadFileR}';">
@@ -429,6 +476,11 @@ resultsNav sid d = [hamlet|
       <i .fa.fa-chain>
       <span .tooltiptext style="width:300px;">
         Get a link to your slide show
+    <button .nav-btn.my-tooltip 
+      onclick="displaySettingsDiv();">
+      <i .fa.fa-cogs>
+      <span .tooltiptext style="width:300px;">
+        Fiddle with various settings
     <div .slidecontainer>
       <input type="range" min="1" max="100" class="slider" value="#{show d}"
         id="durationSlider" name="duration">
@@ -444,19 +496,119 @@ resultsNav sid d = [hamlet|
           <i .fa.fa-files-o>
     |]
 
--- postResultByIdR :: Text -> Handler Html
--- postResultByIdR fuck = do
---   dur <- runInputPost $ Duration 
---                      <$> ireq intField "duration"
---   liftIO $ putStrLn $ pack $ show $ duration dur
---   let sid = Just fuck
---   case sid of
---     Just x -> do
---       setSession "sessionID" x 
---       fl <- getFileList x
---       uf <- uploadFolder
---       defaultLayout $ do
---         setTitle "Ken-Burns slideshow"
---         let navbar = resultsNav $ duration dur
---         let slideshow = getResultById x fl uf $ duration dur
---         $(widgetFile "results")
+getSettingsR :: Text -> Handler Html
+getSettingsR sid = do
+  fl <- getFileList sid
+  uf <- uploadFolder
+  settings <- mkSettings uf 
+                            (unpack sid)
+                            fl 
+                            50
+                            (Just (lookupGetParam . (++ "Object")))
+                            (Just (lookupGetParam . (++ "maxZoom")))
+                            (Just (lookupGetParam . (++ "minZoom")))
+                            (Just (lookupGetParam . (++ "Random")))
+                            Nothing
+  obs <- liftIO $ json2info settings
+  let objectsSorter o1 o2 = compare (sco o2) (sco o1)
+      imgSorter (_,i1) (_,i2) = compare (GetJson.index i1) (GetJson.index i2)
+      fileDir = (unpack sid) </> "thumbs"
+  pc <- widgetToPageContent $ do
+    $(widgetFile "settings")
+  withUrlRenderer
+    [hamlet|
+              $doctype 5
+              <html>
+                  <head>
+                      <title>Hmmmm?
+                      <meta charset=utf-8>
+                      ^{pageHead pc}
+                  <body>
+                      ^{pageBody pc}
+          |]
+
+selectedObject :: PageSettings -> [String]
+selectedObject pages = Map.elems m 
+  where m = map (unpack . f) p
+        p = pagesettings pages 
+        f x = case obj x of
+                Just t  -> unpack t
+                Nothing -> val $ (sortBy g $ objs x)!!0
+        g o1 o2 = compare (sco o2) (sco o1)
+
+imageFp :: FilePath -> SessionId -> ImageId -> FilePath
+imageFp uf sid x  = uf </> sid </> "imgs" </> x ++ ".JPG"
+
+rawImgWidth :: FilePath -> Int
+rawImgWidth _ = width
+
+rawImgHeight :: FilePath -> IO Int
+rawImgHeight fp = do
+  file <- loadJpegFile fp
+  size <- imageSize file
+  return $ snd size
+
+rawImgRatio :: FilePath -> IO Float
+rawImgRatio fp = do
+  h <- rawImgHeight fp
+  let w = fromIntegral $ rawImgWidth fp
+  return $ (fromIntegral h)/w
+
+mkSettings :: FilePath
+           -> SessionId
+           -> [(ImageId,Int)]
+           -> Int
+           -> Maybe (Text -> Handler (Maybe Text))
+           -> Maybe (Text -> Handler (Maybe Text))
+           -> Maybe (Text -> Handler (Maybe Text)) 
+           -> Maybe (Text -> Handler (Maybe Text)) 
+           -> Maybe Int 
+           -> Handler SettingsData
+mkSettings uf sid fl gdur objF maxZF minZF randF dur = do
+  let a = map fst fl
+  obs <- mapM ((fromMaybe (\_ -> return Nothing) objF) . pack) a
+  maxzms <- mapM ((fromMaybe (\_ -> return $ Just "50") maxZF) . pack) a
+  minzms <- mapM ((fromMaybe (\_ -> return $ Just "50") minZF) . pack) a
+  randss <- mapM ((fromMaybe (\_ -> return $ Just "50") randF) . pack) a
+  let mo = Map.fromList $ zip a obs
+      maxz = Map.fromList $ zip a maxzms
+      minz = Map.fromList $ zip a minzms
+      randz = Map.fromList $ zip a randss
+      f (x,y) = (x,ImageSettings x
+                                 y
+                                 (mo Map.! x)
+                                 (maxz Map.! x)
+                                 (minz Map.! x)
+                                 (randz Map.! x)
+                                 (fromMaybe 0 dur)
+                                 width
+                                 (rawImgHeight $ imageFp uf sid x)
+                                 (rawImgRatio $ imageFp uf sid x))
+      m = Map.fromList $ map f fl
+  return $ SettingsData sid uf gdur m 
+
+mkSettingsDefault :: FilePath
+                  -> SessionId
+                  -> [(ImageId,Int)] 
+                  -> Handler SettingsData
+mkSettingsDefault uf sid fl = mkSettings uf 
+                                         sid 
+                                         fl 
+                                         60 
+                                         Nothing 
+                                         Nothing 
+                                         Nothing
+                                         Nothing 
+                                         Nothing
+
+buildQuery :: SettingsData -> QueryString
+buildQuery globalsettings = intercalate "&" $ concat params 
+  where m = Map.toList $ settings globalsettings
+        f (k,v) = [case (obj v) of  
+                    Just b  -> (k ++ "Object", unpack b)
+                    Nothing -> (k ++ "Null", "Null")
+                 ,(k ++ "maxZoom", unpack $ fromMaybe "Nothing" $ maxzoom v)
+                 ,(k ++ "minZoom", unpack $ fromMaybe "Nothing" $ minzoom v)
+                 ,(k ++ "Random", unpack $ fromMaybe "Nothing" $ rand v)]
+        p (x,y) = x ++ "=" ++ y
+        params = map ((map p) . f) m

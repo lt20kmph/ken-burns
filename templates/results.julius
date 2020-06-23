@@ -62,3 +62,74 @@ $(document).mouseup(function(e){
         container.hide();
     }
 });
+
+function verySmallScreen () {
+  if ($(window).width() <= 550){
+    $('.settings-thumb-containor *').css({'font-size':'1.1em'});
+  }
+}
+
+function smallScreen () {
+  if ($(window).width() <= 1200){	
+    $('.settings-thumb-wrapper').css({'width':'100%',
+                                      'max-width':'100%',
+                                      'padding':'0'});
+    $('.settings-thumb-wrapper img').css({'width':'100%'});
+    $('.objects-wrapper').css({'width':'100%',
+                               'padding':'0'});
+    $('.settings-thumb-containor').css({'flex-direction':'column',
+                                        'height':'auto',
+                                        'max-width':'500px'});
+  }
+}
+
+function bigScreen () {
+  if ($(window).width() > 1200){	
+    $('.settings-thumb-wrapper').css({'width':'48%',
+                                      'max-width':'48%',
+                                      'padding-right':'2%'});
+    $('.settings-thumb-wrapper img').css({'width':'30vw'});
+    $('.objects-wrapper').css({'width':'48%',
+                               'padding-left':'2%'});
+    $('.settings-thumb-containor').css({'flex-direction':'row',
+                                        'height':'245px',
+                                        'max-width':'1300px'});
+  }
+}
+
+function displaySettingsDiv() {
+  $('#settings').load('@{SettingsR _sid}',#{query}, function () {
+      //console.log('ok')
+      //smallScreen ();
+      //verySmallScreen();
+  });
+  $('#settings').show()
+  $('#imageContainer').hide()
+}
+
+// media query event handler
+//const mq = window.matchMedia("(min-width: 1200px)");
+//mq.addListener(WidthChange);
+//
+//const mqVs = window.matchMedia("(min-width: 550px)");
+//mqVs.addListener(WidthChange);
+
+// media query change
+function WidthChange(mq) {
+  if (mq.matches) {
+    bigScreen();
+  } else {
+    smallScreen();
+  }
+}
+
+function WidthChangeVS(mq) {
+  if (mq.matches) {
+    //bigScreen();
+  } else {
+    verySmallScreen();
+  }
+}
+
+//WidthChange(mq);
+//WidthChangeVS(mqVs);

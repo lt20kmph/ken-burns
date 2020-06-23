@@ -144,7 +144,7 @@ hr {
 
 .content-bubble img {
   min-width: 25vw;
-  padding: 5px;
+  margin: 10px;
 }
 
 .upload-form {
@@ -200,6 +200,7 @@ hr {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black;
+  outline: 0;
 }
 
 .my-tooltip .tooltiptext {

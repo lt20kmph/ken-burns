@@ -6,10 +6,11 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/              UploadFileR GET POST
-/loading       LoadingR    GET
-/results       ResultR     GET
-/results/#Text ResultByIdR GET
-/download      DownloadR   GET
+/               UploadFileR GET POST
+/loading        LoadingR    GET
+/results        ResultR     GET POST
+/results/#Text  ResultByIdR GET POST
+/download       DownloadR   GET
+/settings/#Text SettingsR   GET
 
 /files  StaticUploadFilesR Static appUploadStatic

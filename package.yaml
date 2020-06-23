@@ -37,7 +37,9 @@ dependencies:
 # - thumbnail-plus
 # - friday-juicypixels
 # - hxt
+- Plural
 - adjunctions
+- hashable
 - gd
 - random
 - random-strings

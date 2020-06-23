@@ -1,0 +1,69 @@
+<div .settings>
+  <h3 .centered-text>Settings adjustment
+  <p>
+    For each picture in your slide show you can select an object which
+    will act as the focal point. You can also control the amount of zoom
+    that happens. The max zoom setting controls how far zoomed out the most 
+    zoomed out view of the the picture will be, 
+    conversely the min zoom controls how far zoomed in the most zoomed in view 
+    will be.
+
+  <form .centered-container.fcol #settingsForm method="POST">
+    $forall (id,infos) <- sortBy imgSorter $ Map.toList (pagesettings obs) 
+       <div .settings-thumb-containor>
+         <div .settings-thumb-wrapper>
+               <img .setting-thumb src="/files/#{fileDir}/#{id}.JPG">
+         <div .objects-wrapper>
+
+           $if null (objs infos)
+              <fieldset id="#{id}" name="#{id}Object">
+                <legend>Objects
+                <p>No objects found, sorry #
+                    <i .fa.fa-frown-o>
+              <fieldset>
+                <legend>Zoom
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ maxzoom infos}" 
+                      name="#{id}maxZoom"> 
+                <legend>Min zoom
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ minzoom infos}" 
+                      name="#{id}minZoom"> 
+                <legend>Randomness
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ rand infos}" 
+                      name="#{id}Random"> 
+
+           $else
+              <fieldset id="#{id}" name="#{id}Object">
+                <legend>Objects
+                <ul>
+                    $forall i <- (take 5 $ sortBy objectsSorter $ objs infos)
+                      <li>
+                        <input id="#{id}-#{val i}" type="radio"
+                        name="#{id}Object"
+                          value="#{val i}"
+                          :isChecked i:checked>
+                        <label for="#{id}-#{val i}">
+                           #{num i} #{toLower $ nam i} (#{sco i}%)
+              <fieldset>
+                <legend>Max zoom
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ maxzoom infos}" 
+                      name="#{id}maxZoom"> 
+                <legend>Min zoom
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ minzoom infos}" 
+                      name="#{id}minZoom"> 
+                <legend>Randomness
+                <div .zoomslidecontainer>
+                  <input type="range" min="1" max="100" 
+                      .slider value="#{fromMaybe "50" $ rand infos}" 
+                      name="#{id}Random"> 
+
+    <input .my-btn.centered-text type="submit" value="Generate new slide show">
