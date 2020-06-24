@@ -911,12 +911,12 @@ ib2css :: IdealBox -> ImageSettings -> IO (Float,Float)
 ib2css b imgsettings = do
   r <- rawratio imgsettings
   let z = extractMinZooms $ minzoom imgsettings
-  let h = (fromIntegral 100)*r
-  let w = (fromIntegral 100)
-  let yb = (22.5 :: Float)
-  let wb = (40.0 :: Float)
-  let x0 = w * (xiT b) * z
-  let y0 = h * (yiT b) * z
+      h = (fromIntegral 100)*r
+      w = (fromIntegral 100)
+      yb = (22.5 :: Float)
+      wb = (40.0 :: Float)
+      x0 = w * (xiT b) * z
+      y0 = h * (yiT b) * z
   S.putStrLn $ show (-x0 +wb, -y0 +yb)
   S.putStrLn $ show $ index imgsettings
   return (- x0 + wb, - y0 + yb)

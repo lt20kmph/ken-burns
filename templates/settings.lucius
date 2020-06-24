@@ -130,6 +130,8 @@ legend {
   }
   .settings-thumb-wrapper img {
     width: 100%;
+    margin: 0;
+    padding: 0;
   }
   label {
     font-size: 1.4em;
